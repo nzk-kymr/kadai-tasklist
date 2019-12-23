@@ -13,7 +13,7 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-     // getでtasks/にアクセスされた場合の「一覧表示処理」
+     // getでtasksにアクセスされた場合の「一覧表示処理」
     public function index()
     {
         $tasks = Task::all();
