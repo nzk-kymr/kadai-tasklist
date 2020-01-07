@@ -16,11 +16,18 @@ class TasksController extends Controller
      // getでtasksにアクセスされた場合の「一覧表示処理」
     public function index()
     {
-        $tasks = Task::all();
-
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $microposts = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+            
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+        }
+        
+        return view('welcome', $data);
     }
 
     /**
@@ -52,12 +59,17 @@ class TasksController extends Controller
             'content' => 'required|max:191',
         ]);
         
-        $task = new Task;
-        $task->status = $request->status;
-        $task->content = $request->content;
-        $task->save();
+        // $task = new Task;
+        // $task->status = $request->status;
+        // $task->content = $request->content;
+        // $task->save();
 
-        return redirect('/');
+        // return redirect('/');
+        $request->user()->tasks()->create([
+            'content' => $request->content,
+        ]);
+
+        return back();
     }
 
     /**
@@ -123,11 +135,21 @@ class TasksController extends Controller
      * @return \Illuminate\Http\Response
      */
      // deleteでtasks/idにアクセスされた場合の「削除処理」
+    // public function destroy($id)
+    // {
+    //     $task = Task::find($id);
+    //     $task->delete();
+
+    //     return redirect('/');
+    // }
     public function destroy($id)
     {
-        $task = Task::find($id);
-        $task->delete();
+        $task = \App\Task::find($id);
 
-        return redirect('/');
+        if (\Auth::id() === $task->user_id) {
+            $task->delete();
+        }
+
+        return back();
     }
 }
