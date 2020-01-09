@@ -19,7 +19,7 @@ class TasksController extends Controller
         $data = [];
         if (\Auth::check()) {
             $user = \Auth::user();
-            $microposts = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
             
             $data = [
                 'user' => $user,
@@ -27,7 +27,7 @@ class TasksController extends Controller
             ];
         }
         
-        return view('welcome', $data);
+        return view('tasks.index', $data);
     }
 
     /**
@@ -59,14 +59,9 @@ class TasksController extends Controller
             'content' => 'required|max:191',
         ]);
         
-        // $task = new Task;
-        // $task->status = $request->status;
-        // $task->content = $request->content;
-        // $task->save();
-
-        // return redirect('/');
         $request->user()->tasks()->create([
             'content' => $request->content,
+            'status' => $request->status,
         ]);
 
         return back();
